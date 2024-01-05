@@ -35,6 +35,10 @@ const (
 	prometheusPathAnnotation        = "prom.path"
 	prometheusSchemeAnnotation      = "prom.scheme"
 	prometheusExtraLabelsAnnotation = "prom.extra-labels" // comma separated extra labels for this pod
+
+	// ease-of-use labels
+	prometheusAuthTypeAnnotation    = "prom.auth-type"
+	prometheusCredentialsAnnotation = "prom.creds"
 )
 
 type containerScrapeConfig struct {
@@ -303,6 +307,18 @@ func (h *dockerHandler) findHostPortAndPathForContainer(containerId string) (boo
 		path := getFromMapOrDefault(prometheusPathAnnotation, c.Config.Labels, "")
 		if path != "" {
 			containerScrapeConfig.Labels[model.MetricsPathLabel] = path
+		}
+
+		// Find auth type
+		authType := getFromMapOrDefault(prometheusAuthTypeAnnotation, c.Config.Labels, "")
+		if authType != "" {
+			containerScrapeConfig.Labels["authorization_type"] = authType
+		}
+
+		// Find credentials
+		credentials := getFromMapOrDefault(prometheusCredentialsAnnotation, c.Config.Labels, "")
+		if credentials != "" {
+			containerScrapeConfig.Labels["authorization_credentials"] = credentials
 		}
 
 		// Find scheme

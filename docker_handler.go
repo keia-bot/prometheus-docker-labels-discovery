@@ -3,12 +3,13 @@ package main
 import (
 	"context"
 	"fmt"
+	"sync"
+	"time"
+
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/client"
 	"github.com/prometheus/common/model"
-	"sync"
-	"time"
 )
 
 type dockerHandler struct {
@@ -26,13 +27,14 @@ const (
 	dockerEventActionDie     = "die"
 	dockerEventTypeContainer = "container"
 
-	prometheusEnableScrapeAnnotation      = "prometheus.io/scrape"
+	prometheusEnableScrapeAnnotation      = "prom.enable"
 	prometheusEnableScrapeAnnotationValue = "true"
-	prometheusPortAnnotation              = "prometheus.io/port"
-	prometheusIpAnnotation                = "prometheus.io/ip"
-	prometheusPathAnnotation              = "prometheus.io/path"
-	prometheusSchemeAnnotation            = "prometheus.io/scheme"
-	prometheusExtraLabelsAnnotation       = "prometheus.io/extra-labels" // comma separated extra labels for this pod
+
+	prometheusPortAnnotation        = "prom.port"
+	prometheusIpAnnotation          = "prom.ip"
+	prometheusPathAnnotation        = "prom.path"
+	prometheusSchemeAnnotation      = "prom.scheme"
+	prometheusExtraLabelsAnnotation = "prom.extra-labels" // comma separated extra labels for this pod
 )
 
 type containerScrapeConfig struct {
